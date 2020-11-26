@@ -9,8 +9,8 @@ function createDeck()
   )
   savedData.deck.setCustomObject(
     {
-      face = "https://i.imgur.com/ZHQ2svW.jpg",
-      back = "https://i.imgur.com/OwysJQd.jpg",
+      face = "https://github.com/OriolBonjoch/TTS-SkullKing/raw/main/data/deck.jpg",
+      back = "https://github.com/OriolBonjoch/TTS-SkullKing/raw/main/data/back.jpg",
       number = 66,
       width = 10,
       height = 7

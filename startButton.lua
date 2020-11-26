@@ -42,7 +42,7 @@ function createStartButton()
 
   button.setCustomObject(
     {
-      mesh = "file:///C:\\Users\\Oriol\\Documents\\tabletop\\botonazito_dividido_2mm_origen.obj",
+      mesh = "https://github.com/OriolBonjoch/TTS-SkullKing/raw/main/data/botonazito_dividido_2mm_origen.obj",
       material = 1,
       convex = true
     }
