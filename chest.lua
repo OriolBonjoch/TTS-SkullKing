@@ -65,10 +65,20 @@ function counter_Submit(obj, player_clicker_color, alt_click)
     return
   end
 
-  log(savedData.rounds[savedData.round])
   savedData.rounds[savedData.round][player_clicker_color].vote = savedData.votes[player_clicker_color]
   broadcastToColor("Your vote has been submitted", player_clicker_color, player_clicker_color)
   obj.clearButtons()
+  
+  for index, playerColor in ipairs(getSeatedPlayers()) do
+    if (savedData.rounds[savedData.round][playerColor].vote == -1) then
+      return
+    end
+  end
+
+  -- Empiezan los turnos!
+  for index, playerColor in ipairs(getSeatedPlayers()) do
+    printToAll("Player "..playerColor.." voted "..savedData.votes[playerColor], playerColor)
+  end
 end
 
 function counterIsMineAndValid(obj, player_clicker_color)

@@ -13,14 +13,7 @@ savedData = {
   rounds = {},
   phase = "start",
   counters = {},
-  order = {
-    [1] = "White",
-    [2] = "Pink",
-    [3] = "Blue",
-    [4] = "Green",
-    [5] = "Yellow",
-    [6] = "Red"
-  }
+  order = {}
 }
 
 function onLoad()
@@ -31,20 +24,18 @@ function onLoad()
   createStartButton()
   createDeck()
   savedData.deck.shuffle()
+  savedData.order = createInitialOrder()
   Turns.enable = false
   Turns.pass_turns = false
   Turns.type = 2
 end
 
-function onUpdate()
-  for index, playerColor in ipairs(getSeatedPlayers()) do
-    if (not savedData.rounds[savedData.round]) then
-      return
-    end
-    if (savedData.rounds[savedData.round][playerColor].vote == -1) then
-      return
-    end
+function createInitialOrder()
+  local tbl = getSeatedPlayers()
+  local len, random = #tbl, math.random
+  for i = len, 2, -1 do
+      local j = random( 1, i )
+      tbl[i], tbl[j] = tbl[j], tbl[i]
   end
-  
-  -- play!
+  return tbl
 end
