@@ -32,6 +32,7 @@ function onObjectDrop( player_color,  dropped_object)
 end
 
 function onObjectDrop(colorName, obj)
+  log(obj.getJSON())
   if Turns.turn_color ~= colorName then 
     broadcastToColor("Is not your turn", colorName, colorName)
     return
@@ -42,7 +43,8 @@ function onObjectDrop(colorName, obj)
   savedData.rounds[savedData.round][colorName].card = obj.getGUID()
 
   savedData.orderCount = savedData.orderCount + 1
-  printToAll(savedData.orderCount)
+  
+  log(savedData.orderCount)
   log(Turns.getNextTurnColor())
   if (savedData.orderCount == #savedData.order) then
     -- calcular quien gana
@@ -50,8 +52,11 @@ function onObjectDrop(colorName, obj)
     savedData.orderCount = 0
     printToAll("inside")
   end
+
+  log(savedData.order)
+  printToAll(savedData.order[savedData.orderCount + 1])
   
-  Turns.turn_color = savedData.order[savedData.orderCount]
+  Turns.turn_color = savedData.order[savedData.orderCount + 1]
 
   broadcastToAll(colorName .. " dropped " .. obj.getGUID())
 end
