@@ -1,20 +1,19 @@
-function startClickFunc(obj, player_clicker_color, alt_click)
+function startButtonClickedCallback(obj, player_clicker_color, alt_click)
   savedData.round = savedData.round + 1
   local roundData = {}
   for index, playerColor in ipairs(getSeatedPlayers()) do
-    savedData.deck.deal(savedData.round, playerColor)
     initPlayer(playerColor)
+    savedData.deck.deal(savedData.round, playerColor)
     roundData[playerColor] = { vote = -1 }
     -- for _, data2 in ipairs(Player[playerColor].getHandObjects(1)) do
     --   local cardData2 = savedData.cards[data2.getGUID()]
     --   data2.setDescription(cardData2.name .. " - " .. cardData2.value)
     -- end
   end
-
   table.insert(savedData.rounds, savedData.round, roundData)
 end
 
-function createStartButton()
+function startButtonDraw()
   local button =
     spawnObject(
     {
@@ -26,7 +25,7 @@ function createStartButton()
         obj.setLock(true)
         obj.createButton(
           {
-            click_function = "startClickFunc",
+            click_function = "startButtonClickedCallback",
             label = "Start",
             width = 400,
             height = 300,
@@ -47,10 +46,4 @@ function createStartButton()
       convex = true
     }
   )
-  savedData.firstPlayer = savedData.order[1]
-end
-
-function initPlayer(playerColor)
-  savedData.votes[playerColor] = 0
-  createChest(playerColor)
 end

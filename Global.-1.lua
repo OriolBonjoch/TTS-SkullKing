@@ -1,87 +1,112 @@
--- require("vscode/console")
 require "seedData"
+require "gameMode"
+require "helpers"
 require "chest"
 require "deck"
+require "winsLabel"
 require "startButton"
+require "gameLogic"
 
 savedData = {
-  firstPlayer = "",
   round = 0,
+  trick = 0,
   cards = {},
+  suit = "",
   deck,
+  chests = {},
+  labels = {},
   votes = {},
   rounds = {},
-  phase = "start",
-  counters = {},
-  order = {},
-  orderCount = 0
+  phase = "start"
 }
 
--- rounds = {
---   [1] = {
---     White = {
---       vote = 0,
---       card = XX
---     }
---   }
--- }
+state = {}
 
-function onObjectDrop( player_color,  dropped_object)
-  log(player_color)
-  log(dropped_object)
-end
-
-function onObjectDrop(colorName, obj)
-  log(obj.getJSON())
-  if Turns.turn_color ~= colorName then 
-    broadcastToColor("Is not your turn", colorName, colorName)
+-- global.lua
+function onObjectDrop(playerColor, obj)
+  if Turns.turn_color ~= playerColor then 
+    -- broadcastToColor("Is not your turn", playerColor, colorName)
     return
   end
 
-  local data = savedData.cards[obj.getGUID()]
-  printToAll(data.name .. " - " .. data.value, "White")
-  savedData.rounds[savedData.round][colorName].card = obj.getGUID()
-
-  savedData.orderCount = savedData.orderCount + 1
-  
-  log(savedData.orderCount)
-  log(Turns.getNextTurnColor())
-  if (savedData.orderCount == #savedData.order) then
-    -- calcular quien gana
-    -- calcular puntos si es ultima mano
-    savedData.orderCount = 0
-    printToAll("inside")
+  if (has_value(getCurrentPlayerHandCardIds(), obj.getGUID())) then
+    return
   end
-
-  log(savedData.order)
-  printToAll(savedData.order[savedData.orderCount + 1])
   
-  Turns.turn_color = savedData.order[savedData.orderCount + 1]
-
-  broadcastToAll(colorName .. " dropped " .. obj.getGUID())
+  local data = savedData.cards[obj.getGUID()]
+  if (not savedData.suit and has_value({ "mapa", "cofre", "loro", "bandera"}, data.name)) then
+    savedData.suit = data.name
+  end
+  printToAll(data.name .. " - " .. data.value, playerColor)
+  table.insert(savedData.rounds[savedData.round][playerColor].cards, savedData.trick, obj.getGUID())
 end
-
 
 function onLoad()
   for index, data in ipairs(getAllObjects()) do
     data.destruct()
   end
 
-  createStartButton()
-  createDeck()
+  -- state.Mode = GameMode:create(nil, true)
+  startButtonDraw()
+  deckDraw()
   savedData.deck.shuffle()
-  savedData.order = createInitialOrder()
-  Turns.enable = false
+  -- state.Mode.start()  
+  Turns.order = createInitialOrder()
   Turns.pass_turns = false
-  Turns.type = 1
+  Turns.enable = false
+  Turns.type = 2
 end
 
-function createInitialOrder()
-  local tbl = getSeatedPlayers()
-  local len, random = #tbl, math.random
-  for i = len, 2, -1 do
-      local j = random( 1, i )
-      tbl[i], tbl[j] = tbl[j], tbl[i]
+-- helper function to avoid cheating
+-- TO FIX: DOES NOT WORK
+-- function onObjectPickUp( player_color, obj)
+--   -- check if is a card
+--   -- chekc if there is suit
+--   -- check if is different from suit
+--   print(Turns.enable)
+--   print(Turns.turn_color)
+--   print(player_color)
+--   if (not Turns.enable or Turns.turn_color ~= player_color) then 
+--     obj.drop()
+--     return
+--   end
+
+--   local cardId = obj.getGUID()
+--   local cardData = savedData.cards[cardId]
+--   if (not cardData) then
+--     return
+--   end
+  
+--   function convertToCard(obj)
+--     local cardId = obj.getGUID()
+--     return savedData.cards[cardId].name
+--   end 
+
+--   print("Hemos llegado")
+--   cardsInHand = map(convertToCard, Player[player_color].getHandObjects(1))
+--   if (savedData.suit and savedData.suit ~= cardData.name and not has_value(staticData.isFigure, cardData.name) and has_value(cardsInHand, savedData.suit)) then
+--     obj.drop()
+--   end
+-- end
+
+function onPlayerTurn(person)
+  if (not savedData.rounds[savedData.round]) then
+    return
   end
-  return tbl
+
+  for index, player_color in ipairs(getSeatedPlayers()) do
+    if (not savedData.rounds[savedData.round][player_color] or savedData.rounds[savedData.round][player_color].vote == -1) then
+      return
+    end
+  end
+
+  for index, player_color in ipairs(getSeatedPlayers()) do
+    if (not savedData.rounds[savedData.round][player_color].cards[savedData.trick]) then
+      return
+    end
+  end
+  print(person.color .. "'s turn starts now.")
+
+  endTrick()
+  startTrick()
 end

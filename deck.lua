@@ -1,4 +1,4 @@
-function createDeck()
+function deckDraw()
   savedData.deck =
     spawnObject(
     {
