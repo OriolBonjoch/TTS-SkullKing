@@ -13,18 +13,17 @@ function calculateWinner()
   local winner = ""
   local suit = ""
   local highestValue = -1
+
   for index, playerColor in ipairs(Turns.order) do
     print("Jugador "..index)
     local cardId = savedData.rounds[savedData.round][playerColor].cards[savedData.trick]
     local cardData = savedData.cards[cardId]
+
     if (suit == "" and has_value({ "mapa", "cofre", "loro", "bandera"}, cardData.name)) then
       print("manda el palo ".. cardData.name)
       suit = cardData.name
     end
-    if (winner == "") then
-      print("el primer jugador gana")
-      winner = playerColor
-    end
+
     if (cardData.name == suit) then
       if (cardData.value > highestValue) then
         print("el jugador ".. playerColor .. " gana")
