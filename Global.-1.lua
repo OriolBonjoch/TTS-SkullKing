@@ -22,7 +22,6 @@ savedData = {
 
 state = {}
 
--- global.lua
 function onObjectDrop(playerColor, obj)
   if Turns.turn_color ~= playerColor then 
     -- broadcastToColor("Is not your turn", playerColor, colorName)
@@ -34,6 +33,10 @@ function onObjectDrop(playerColor, obj)
   end
   
   local data = savedData.cards[obj.getGUID()]
+  if (not data) then
+    return
+  end
+
   if (not savedData.suit and has_value({ "mapa", "cofre", "loro", "bandera"}, data.name)) then
     savedData.suit = data.name
   end
@@ -58,36 +61,37 @@ function onLoad()
 end
 
 -- helper function to avoid cheating
--- TO FIX: DOES NOT WORK
--- function onObjectPickUp( player_color, obj)
---   -- check if is a card
---   -- chekc if there is suit
---   -- check if is different from suit
---   print(Turns.enable)
---   print(Turns.turn_color)
---   print(player_color)
---   if (not Turns.enable or Turns.turn_color ~= player_color) then 
---     obj.drop()
---     return
---   end
+function onObjectPickUp(player_color, obj)
+  -- check if is a card
+  -- chekc if there is suit
+  -- check if is different from suit
+  if (not Turns.enable or Turns.turn_color ~= player_color) then 
+    obj.drop()
+    return
+  end
 
---   local cardId = obj.getGUID()
---   local cardData = savedData.cards[cardId]
---   if (not cardData) then
---     return
---   end
+  local cardId = obj.getGUID()
+  local cardData = savedData.cards[cardId]
+  print('-1-')
+  log(not cardData)
+  print('-2-')
+  log(cardData)
+  print('-3-')
+  if (not cardData) then
+    return
+  end
   
---   function convertToCard(obj)
---     local cardId = obj.getGUID()
---     return savedData.cards[cardId].name
---   end 
+  function convertToCard(obj)
+    local cardId = obj.getGUID()
+    return savedData.cards[cardId].name
+  end 
 
---   print("Hemos llegado")
---   cardsInHand = map(convertToCard, Player[player_color].getHandObjects(1))
---   if (savedData.suit and savedData.suit ~= cardData.name and not has_value(staticData.isFigure, cardData.name) and has_value(cardsInHand, savedData.suit)) then
---     obj.drop()
---   end
--- end
+  print("Hemos llegado")
+  cardsInHand = map(convertToCard, Player[player_color].getHandObjects(1))
+  if (savedData.suit and savedData.suit ~= cardData.name and not has_value(staticData.isFigure, cardData.name) and has_value(cardsInHand, savedData.suit)) then
+    obj.drop()
+  end
+end
 
 function onPlayerTurn(person)
   if (not savedData.rounds[savedData.round]) then

@@ -14,22 +14,28 @@ function calculateWinner()
   local suit = ""
   local highestValue = -1
   for index, playerColor in ipairs(Turns.order) do
+    print("Jugador "..index)
     local cardId = savedData.rounds[savedData.round][playerColor].cards[savedData.trick]
     local cardData = savedData.cards[cardId]
-    if (not suit and has_value({ "mapa", "cofre", "loro", "bandera"}, cardData.name)) then
+    if (suit == "" and has_value({ "mapa", "cofre", "loro", "bandera"}, cardData.name)) then
+      print("manda el palo ".. cardData.name)
       suit = cardData.name
     end
-    if (index == 0) then
+    if (winner == "") then
+      print("el primer jugador gana")
       winner = playerColor
     end
     if (cardData.name == suit) then
       if (cardData.value > highestValue) then
+        print("el jugador ".. playerColor .. " gana")
         winner = playerColor
         highestValue = cardData.value
       end
     else
       if (has_value(suitPriority, cardData.name)) then
+        print("has_value(suitPriority, cardData.name) ")
         if (cardData.value > highestValue) then
+          print("cardData.value > highestValue ")
           winner = playerColor
           highestValue = cardData.value
         end
@@ -44,6 +50,7 @@ end
 function startRound()
   for index, playerColor in ipairs(getSeatedPlayers()) do
     savedData.rounds[savedData.round][playerColor].cards = {}
+    savedData.rounds[savedData.round][playerColor].wins = 0
     printToAll("Player " .. playerColor .. " voted " .. savedData.votes[playerColor], playerColor)
     winsLabelDraw(playerColor)
   end
@@ -59,15 +66,19 @@ end
 
 function endTrick()
   broadcastToAll("Trick finished! calculate winner", playerColor)
+  
+  log( savedData.rounds)
   local winner = calculateWinner()
+
   for index, player_color in ipairs(getSeatedPlayers()) do
     local cardId = savedData.rounds[savedData.round][player_color].cards[savedData.trick]
     local card = getObjectFromGUID(cardId)
     card.destruct()
   end
 
-  savedData.rounds[savedData.round][player_color].wins = savedData.rounds[savedData.round][player_color].wins + 1
-  victoriesLabelUpdate(player_color)
+  savedData.rounds[savedData.round][winner].wins = savedData.rounds[savedData.round][winner].wins + 1
+  
+  winsLabelUpdate(winner)
 
   -- subir puntos (rey pirata o sirena)
 
@@ -77,3 +88,6 @@ function endTrick()
     Turns.enable = false
   end
 end
+
+
+

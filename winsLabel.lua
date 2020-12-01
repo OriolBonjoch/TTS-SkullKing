@@ -1,3 +1,4 @@
+
 function winsLabelDraw(playerColor)
   local data = staticData.players[playerColor]
   local label = spawnObject(
@@ -7,14 +8,14 @@ function winsLabelDraw(playerColor)
       rotation = data.labelRotation
     }
   )
-
-  savedData.labels[playerColor] = label.getGUID()
+  
+  savedData.labels[playerColor] = label
   label.setLock(true)
   label.TextTool.setFontColor(playerColor)
   label.TextTool.setValue("0")
 end
 
 function winsLabelUpdate(playerColor)
-  local label = getObjectFromGUID(savedData.labels[playerColor])
-  label.TextTool.setValue(savedData.rounds[savedData.round][playerColor].wins)
+  local label = savedData.labels[playerColor]
+  label.TextTool.setValue(tostring(savedData.rounds[savedData.round][playerColor].wins))
 end
