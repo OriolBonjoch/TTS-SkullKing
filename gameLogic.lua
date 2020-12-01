@@ -81,7 +81,6 @@ function endTrick()
 
   -- subir puntos (rey pirata o sirena)
 
-  printToAll(savedData.trick, Color.Whit)
   savedData.trick = savedData.trick - 1
   if (savedData.trick == 0) then
     broadcastToAll("TODO: Bid again", Color.White)
