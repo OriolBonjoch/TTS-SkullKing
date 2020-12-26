@@ -8,12 +8,12 @@ function createInitialOrder()
   return tbl
 end
 
-function getCurrentPlayerHandCardIds()
+function getCurrentPlayerHandCardIds(playerColor)
   function getCardId(obj)
     return obj.getGUID()
   end 
 
-  return map(getCardId, Player[Turns.turn_color].getHandObjects(1))
+  return map(getCardId, Player[playerColor].getHandObjects(1))
 end
 
 function has_value (tab, val)

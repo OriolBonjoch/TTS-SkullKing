@@ -1,6 +1,16 @@
+WinsLabel = {}
+WinsLabel.__index = WinsLabel
 
-function winsLabelDraw(playerColor)
-  local data = staticData.players[playerColor]
+function WinsLabel.create()
+  local self = setmetatable({}, WinsLabel)
+  self.obj = nil
+  return self
+end
+
+function WinsLabel:draw(data, playerColor)
+  if (self.obj ~= nil) then
+    self.obj.destruct()
+  end
   local label = spawnObject(
     {
       type = "3DText",
@@ -9,13 +19,12 @@ function winsLabelDraw(playerColor)
     }
   )
   
-  savedData.labels[playerColor] = label
   label.setLock(true)
   label.TextTool.setFontColor(playerColor)
   label.TextTool.setValue("0")
+  self.obj = label
 end
 
-function winsLabelUpdate(playerColor)
-  local label = savedData.labels[playerColor]
-  label.TextTool.setValue(tostring(savedData.rounds[savedData.round][playerColor].wins))
+function WinsLabel:update(wins)
+  self.obj.TextTool.setValue(tostring(wins))
 end

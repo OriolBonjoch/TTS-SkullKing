@@ -1,21 +1,16 @@
-function startButtonClickedCallback(obj, player_clicker_color, alt_click)
-  savedData.round = savedData.round + 1
-  local roundData = {}
-  for index, playerColor in ipairs(getSeatedPlayers()) do
-    initPlayer(playerColor)
-    savedData.deck.deal(savedData.round, playerColor)
-    roundData[playerColor] = { vote = -1 }
-    -- for _, data2 in ipairs(Player[playerColor].getHandObjects(1)) do
-    --   local cardData2 = savedData.cards[data2.getGUID()]
-    --   data2.setDescription(cardData2.name .. " - " .. cardData2.value)
-    -- end
-  end
-  table.insert(savedData.rounds, savedData.round, roundData)
+StartButton = {}
+StartButton.__index = StartButton
+
+function StartButton.create()
+  local self = setmetatable({}, StartButton)
+  self.obj = nil
+  return self
 end
 
-function startButtonDraw()
-  local button =
-    spawnObject(
+function StartButton:draw()
+  local button = self
+  self.obj =
+  spawnObject(
     {
       type = "Custom_Model",
       position = {x = 0, y = 1.2, z = -5},
@@ -25,7 +20,7 @@ function startButtonDraw()
         obj.setLock(true)
         obj.createButton(
           {
-            click_function = "startButtonClickedCallback",
+            click_function = "_startButtonClickedCallback",
             label = "Start",
             width = 400,
             height = 300,
@@ -39,11 +34,22 @@ function startButtonDraw()
     }
   )
 
-  button.setCustomObject(
+  self.obj.setCustomObject(
     {
       mesh = "https://github.com/OriolBonjoch/TTS-SkullKing/raw/main/data/botonazito_dividido_2mm_origen.obj",
       material = 1,
       convex = true
     }
   )
+end
+
+function _startButtonClickedCallback(obj, playerClickerColor, altClick)
+  state.Game = SK_Game.create()
+  state.Player = {}
+  for index, playerColor in ipairs(getSeatedPlayers()) do
+    state.Player[playerColor] = SK_Player.create(playerColor, staticData.players[playerColor])
+  end
+  state.Game:startBidding()
+  state.Mode:start()
+  obj.destruct()
 end

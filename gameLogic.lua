@@ -1,5 +1,5 @@
 function initPlayer(playerColor)
-  savedData.votes[playerColor] = 0
+  savedData.votes[playerColor] = -1
   chestDraw(playerColor)
 end
 
@@ -14,7 +14,7 @@ function calculateWinner()
   local suit = ""
   local highestValue = -1
 
-  for index, playerColor in ipairs(Turns.order) do
+  for index, playerColor in ipairs(getSeatedPlayers()) do
     print("Jugador "..index)
     local cardId = savedData.rounds[savedData.round][playerColor].cards[savedData.trick]
     local cardData = savedData.cards[cardId]
@@ -55,7 +55,7 @@ function startRound()
   end
 
   savedData.trick = savedData.round
-  Turns.enable = true
+  state.Mode:startCardPhase()
   startTrick()
 end
 
@@ -66,7 +66,6 @@ end
 function endTrick()
   broadcastToAll("Trick finished! calculate winner", playerColor)
   
-  log( savedData.rounds)
   local winner = calculateWinner()
 
   for index, player_color in ipairs(getSeatedPlayers()) do
@@ -83,12 +82,12 @@ function endTrick()
 
   savedData.trick = savedData.trick - 1
   if (savedData.trick == 0) then
-    broadcastToAll("TODO: Bid again", Color.White)
-    -- savedData.deck.reload()
-    savedData.deck.reset()
-    savedData.deck.shuffle()
-    Turns.enable = false
+    startBidding()
   end
 end
 
-
+function startBidding()
+  broadcastToAll("TODO: Bid again", Color.White)
+  state.Deck:shuffle()
+  state.Mode:startBidding()
+end

@@ -1,7 +1,37 @@
-function createChestButtons(obj, color)
+Chest = {}
+Chest.__index = Chest
+
+function Chest.create()
+  local self = setmetatable({}, Chest)
+  self.obj = nil
+  return self
+end
+
+function Chest:draw(playerColor, data)
+  if (self.obj) then
+    self.obj.destruct()
+  end
+  self.obj =
+    spawnObject(
+    {
+      type = "Tileset_Chest",
+      position = data.chestPosition,
+      rotation = data.chestRotation,
+      scale = {x = 2, y = 2, z = 2},
+      callback_function = function(obj)
+        obj.setLock(true)
+        obj.setColorTint(data.chestColor)
+        self:_createChestButtons(obj, data.chestColor)
+      end
+    }
+  )
+end
+
+
+function Chest:_createChestButtons(obj, color)
   obj.createButton(
     {
-      click_function = "chestClickedCallback",
+      click_function = "_chestClickedCallback",
       color = color,
       width = 370,
       height = 290,
@@ -11,7 +41,7 @@ function createChestButtons(obj, color)
 
   obj.createButton(
     {
-      click_function = "chestSubmitCallback",
+      click_function = "_chestSubmitCallback",
       color = color,
       width = 370,
       height = 290,
@@ -22,69 +52,40 @@ function createChestButtons(obj, color)
   )
 end
 
-function chestDraw(playerColor)
-  local data = staticData.players[playerColor]
-  local chest =
-    spawnObject(
-    {
-      type = "Tileset_Chest",
-      position = data.chestPosition,
-      rotation = data.chestRotation,
-      scale = {x = 2, y = 2, z = 2},
-      callback_function = function(obj)
-        savedData.chests[playerColor] = obj.getGUID()
-        obj.setLock(true)
-        obj.setColorTint(data.chestColor)
-        createChestButtons(obj, data.chestColor)
-      end
-    }
-  )
-end
-
-function chestClickedCallback(obj, player_clicker_color, alt_click)
-  if (not chestValidateObject(obj, player_clicker_color)) then
+function _chestClickedCallback(obj, player_clicker_color, alt_click)
+  local player = state.Player[player_clicker_color]
+  if (not player:canBid(obj)) then
     return
   end
 
-  local oldValue = savedData.votes[player_clicker_color]
-  local newValue = oldValue
-  if alt_click and oldValue > 0 then
-    newValue = oldValue - 1
-  elseif (not alt_click and oldValue < savedData.round) then
-    newValue = oldValue + 1
+  local vote = (player.vote == -1) and 0 or player.vote
+  local newValue = vote
+  if alt_click and vote > 0 then
+    newValue = vote - 1
+  elseif (not alt_click and vote < state.Game.round) then
+    newValue = vote + 1
   else
     return
   end
 
-  savedData.votes[player_clicker_color] = newValue
-  broadcastToColor("You voted " .. newValue, player_clicker_color, player_clicker_color)
+  player:bid(newValue)
 end
 
-function chestSubmitCallback(obj, player_clicker_color, alt_click)
-  if (not chestValidateObject(obj, player_clicker_color)) then
+function _chestSubmitCallback(obj, player_clicker_color, alt_click)
+  local player = state.Player[player_clicker_color]
+  if (not player:canBid(obj)) then
     return
   end
 
-  savedData.rounds[savedData.round][player_clicker_color].vote = savedData.votes[player_clicker_color]
+  player:submitBid()
   broadcastToAll(player_clicker_color .. " voted", player_clicker_color)
   obj.clearButtons()
 
-  for index, playerColor in ipairs(getSeatedPlayers()) do
-    if (savedData.rounds[savedData.round][playerColor].vote == -1) then
+  for color, player in pairs(state.Player) do
+    if (player.vote == -1) then
       return
     end
   end
 
-  startRound()
-end
-
-function chestValidateObject(obj, player_clicker_color)
-  if (savedData.chests[player_clicker_color] ~= obj.getGUID()) then
-    return false
-  end
-
-  if (savedData.rounds[savedData.round][player_clicker_color].vote ~= -1) then
-    return false
-  end
-  return true
+  state.Game:startRound()
 end
