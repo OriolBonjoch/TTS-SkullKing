@@ -50,6 +50,11 @@ function _startButtonClickedCallback(obj, playerClickerColor, altClick)
     state.Player[playerColor] = SK_Player.create(playerColor, staticData.players[playerColor])
   end
   state.Game:startBidding()
-  state.Mode:start()
+  local order = getSeatedPlayers()
+  shuffleTable(order)
+  Turns.order = order
+  Turns.pass_turns = false
+  Turns.turn_color = order[1]
+  
   obj.destruct()
 end

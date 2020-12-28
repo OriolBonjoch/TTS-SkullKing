@@ -1,5 +1,4 @@
-function createInitialOrder()
-  local tbl = getSeatedPlayers()
+function shuffleTable(tbl)
   local len, random = #tbl, math.random
   for i = len, 2, -1 do
       local j = random( 1, i )
@@ -14,6 +13,15 @@ function getCurrentPlayerHandCardIds(playerColor)
   end 
 
   return map(getCardId, Player[playerColor].getHandObjects(1))
+end
+
+function table.find(f, l)
+  for _, v in ipairs(l) do
+    if f(v) then
+      return v
+    end
+  end
+  return nil
 end
 
 function has_value (tab, val)

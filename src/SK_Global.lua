@@ -1,23 +1,14 @@
-require("seedData")
-require("helpers")
+-- require("src.data.seedData")
+-- require("src.data.helperFunctions")
 
-require("deck")
-require("startButton")
-require("SK_Player")
--- require("gameLogic")
-require("gameMode")
-require("SK_Game")
+-- require("src.assets.deck")
+-- require("src.assets.startButton")
 
-savedData = {
-  -- round = 0,
-  trick = 0,
-  cards = {},
-  suit = "",
-  labels = {},
-  votes = {},
-  rounds = {},
-  phase = "start"
-}
+-- require("src.SK_GameMode")
+-- require("src.SK_Player")
+-- require("src.SK_Game")
+-- require("src.SK_Global")
+
 
 state = {
   Mode = {},
@@ -32,7 +23,7 @@ function onLoad()
     data.destruct()
   end
 
-  state.Mode = GameMode.create(true)
+  state.Mode = SK_GameMode.create(false)
   state.StartButton = StartButton.create()
   state.Deck = Deck.create()
   
@@ -42,23 +33,13 @@ function onLoad()
 end
 
 function onObjectDrop(playerColor, obj)
-  if (not state.Mode:isPlayerTurn(playerColor)) then 
-    log("not player's turn")
-    return
-  end
-
-  if (state.Game.phase == "bidding") then
-    log("bidding phase")
-    return
-  end
-
   local player = state.Player[playerColor]
-  if (player:hasCardInHand(obj)) then
-    log("dropped at hand")
+  local card = state.Deck.cards[obj.getGUID()]
+  if (not card) then
     return
   end
 
-  player:playCard(obj)
+  state.Game:playCard(player, obj.getGUID())
 end
 
 -- helper function to avoid cheating
@@ -94,12 +75,5 @@ function onPlayerTurn(person)
     return
   end
 
-  state.Game:startTrick()
-  for color, player in pairs(state.Player) do
-    if (player:hasCards()) then
-      return
-    end
-  end
-
-  state.Game:startTrick()
+  -- state.Game:startTrick()
 end

@@ -1,5 +1,5 @@
-require("chest")
-require("winsLabel")
+require("src.assets.chestObject")
+require("src.assets.winsLabel")
 
 SK_Player = {
   color = "",
@@ -15,8 +15,11 @@ function SK_Player.create(color, data)
   self.data = data
   self.vote = -1
   self.rounds = {}
-  self.chest = Chest.create()
+  self.playedCard = ""
+
+  self.chest = ChestObject.create()
   self.winsLabel= WinsLabel.create()
+  
   return self
 end
 
@@ -58,41 +61,26 @@ function SK_Player:submitBid()
   end
 
   self.rounds[state.Game.round].vote = self.vote
-  state.Mode:submitBid()
 end
 
-function SK_Player:hasCardInHand(obj)
-  for index, handObj in ipairs(Player[self.color].getHandObjects()) do
-    if obj.getGUID() == handObj.getGUID() then
-      return true
-    end
-  end
-
-  return false
-end
-
-function SK_Player:playCard(card)
-  local data = state.Deck.cards[card.getGUID()]
-  log(data)
+function SK_Player:playCard(cardId)
+  local data = state.Deck.cards[cardId]
   if (not data) then
     return
   end
 
-  -- if (not savedData.suit and has_value({ "mapa", "cofre", "loro", "bandera"}, data.name)) then
-  --   savedData.suit = data.name
-  -- end
-
   printToAll(data.name .. " - " .. data.value, playerColor)
   local currentRound = self.rounds[state.Game.round]
   currentRound.tricks = currentRound.tricks + 1
-  table.insert(currentRound.cards, currentRound.tricks, card.getGUID())
-  state.Mode:playCard()
+  table.insert(currentRound.cards, currentRound.tricks, cardId)
 end
 
-function SK_Player:hasCards()
+function SK_Player:hasCards(trick)
+  local count = 0
   for index, handObj in ipairs(Player[self.color].getHandObjects()) do
-    return true
+    count = count + 1
   end
+  log(self.color .. " has " .. count .. " of ".. trick)
 
-  return false
+  return trick > count
 end

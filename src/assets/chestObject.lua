@@ -1,13 +1,13 @@
-Chest = {}
-Chest.__index = Chest
+ChestObject = {}
+ChestObject.__index = ChestObject
 
-function Chest.create()
-  local self = setmetatable({}, Chest)
+function ChestObject.create()
+  local self = setmetatable({}, ChestObject)
   self.obj = nil
   return self
 end
 
-function Chest:draw(playerColor, data)
+function ChestObject:draw(playerColor, data)
   if (self.obj) then
     self.obj.destruct()
   end
@@ -28,7 +28,7 @@ function Chest:draw(playerColor, data)
 end
 
 
-function Chest:_createChestButtons(obj, color)
+function ChestObject:_createChestButtons(obj, color)
   obj.createButton(
     {
       click_function = "_chestClickedCallback",
