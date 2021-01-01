@@ -1,44 +1,58 @@
-function shuffleTable(tbl)
+-- function shuffleTable(tbl)
+--   local len, random = #tbl, math.random
+--   for i = len, 2, -1 do
+--     local j = random(1, i)
+--     tbl[i], tbl[j] = tbl[j], tbl[i]
+--   end
+--   return tbl
+-- end
+
+function table.random(tbl)
   local len, random = #tbl, math.random
-  for i = len, 2, -1 do
-      local j = random( 1, i )
-      tbl[i], tbl[j] = tbl[j], tbl[i]
-  end
-  return tbl
+  return tbl[random(1, len)]
 end
 
-function getCurrentPlayerHandCardIds(playerColor)
-  function getCardId(obj)
-    return obj.getGUID()
-  end 
-
-  return map(getCardId, Player[playerColor].getHandObjects(1))
-end
-
-function table.find(f, l)
-  for _, v in ipairs(l) do
-    if f(v) then
-      return v
+function table.find(tbl, funct)
+  for _, value in ipairs(tbl) do
+    if funct(value) then
+      return value
     end
   end
   return nil
 end
 
-function has_value (tab, val)
-  for index, value in ipairs(tab) do
-      if value == val then
-          return true
-      end
+function table.advance(tbl, first)
+  local result = {}
+  local found = false
+  for _, value in ipairs(tbl) do
+    if (found or value == first) then
+      found = true
+      table.insert(result, value)
+    end
   end
+  for _, value in ipairs(tbl) do
+    if (value == first) then
+      return result
+    end
+    table.insert(result, value)
+  end
+  return tbl
+end
 
+function table.exists(tbl, val)
+  for _, value in ipairs(tbl) do
+    if value == val then
+      return true
+    end
+  end
   return false
 end
 
-function map(f, t)
+function table.map(f, t)
   local t1 = {}
   local t_len = #t
   for i = 1, t_len do
-      t1[i] = f(t[i])
+    t1[i] = f(t[i])
   end
   return t1
 end

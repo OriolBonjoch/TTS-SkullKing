@@ -1,3 +1,5 @@
+require("src.SK_Trick")
+
 SK_Game = {}
 SK_Game.__index = SK_Game
 
@@ -7,14 +9,13 @@ function SK_Game.create()
   self.trick = 0
   self.tricks = {}
   self.phase = "bidding"
-  -- self.suit = ""
   return self
 end
 
 function SK_Game:startBidding()
   self.round = self.round + 1
   self.phase = "bidding"
-  
+
   log("+++ game startBidding")
   for playerColor, player in pairs(state.Player) do
     player:startBidding(self.round)
@@ -29,52 +30,47 @@ function SK_Game:startRound()
   end
 
   self.trick = 0
+  self.tricks = {}
+  table.insert(self.tricks, SK_Trick.create())
 end
 
-function SK_Game:startTrick()
-  for color, player in pairs(state.Player) do
-    log(color)
-    if (not player:hasCards(self.round - self.trick)) then
-      return
-    end
+function SK_Game:isEndTrick()
+  local currentTrick = self.tricks[self.trick+1]
+  if (not currentTrick) then
+    return false
   end
+  return currentTrick:isFinished()
+end
+
+function SK_Game:endTrick()
+  -- broadcastToAll("Trick finished! calculate winner", Color.White)
+  local currentTrick = self.tricks[self.trick + 1]
+  currentTrick:calculate()
+  local winnerColor = currentTrick.result.winner
+  local winnerPlayer = state.Player[winnerColor]
+  winnerPlayer:winTrick(currentTrick)
 
   self.trick = self.trick + 1
-  broadcastToAll("Trick finished! calculate winner", Color.White)
-
-  if (self.trick == self.round) then
-    log("round finished! calculate round points.")
-  end
-  -- local winner = calculateWinner()
-
-  -- for index, player_color in ipairs(getSeatedPlayers()) do
-  --   local cardId = savedData.rounds[savedData.round][player_color].cards[savedData.trick]
-  --   local card = getObjectFromGUID(cardId)
-  --   -- card.destruct()
-  -- end
-
-  -- savedData.rounds[savedData.round][winner].wins = savedData.rounds[savedData.round][winner].wins + 1
-  
-  -- winsLabelUpdate(winner)
-
-  -- -- subir puntos (rey pirata o sirena)
-
-  -- savedData.trick = savedData.trick - 1
-  -- if (savedData.trick == 0) then
-  --   startBidding()
-  -- end
-  -- savedData.suit = ""
-end
-
-function SK_Game:playCard(player, cardId)
-  local isCard = function(obj) return obj.getGUID() == cardId end
-  local card = table.find(isCard, Player[player.color].getHandObjects())
-  if (self.phase == "bidding" or
-      Turns.turn_color ~= player.color or 
-      not card) then
-      -- player:hasCardInHand(cardId)) then
+  if (self.trick ~= self.round) then
     return
   end
 
-  -- player:playCard(obj)
+  log("round finished! calculate round points.")
+  for index, playerColor in ipairs(getSeatedPlayers()) do
+    local player = state.Player[playerColor]
+    log(playerColor .. " voted " .. player.vote .. " and got " .. player.rounds[self.round].vote)
+  end
+end
+
+function SK_Game:playCard(player, cardId)
+  local isCard = function(obj)
+    return obj.getGUID() == cardId
+  end
+  local card = table.find(Player[player.color].getHandObjects(), isCard)
+  if (self.phase == "bidding" or card) then -- or Turns.turn_color ~= player.color
+    return
+  end
+
+  local trick = self.tricks[self.trick+1]
+  trick:playCard(player, cardId)
 end

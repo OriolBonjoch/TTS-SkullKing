@@ -10,7 +10,7 @@ end
 function StartButton:draw()
   local button = self
   self.obj =
-  spawnObject(
+    spawnObject(
     {
       type = "Custom_Model",
       position = {x = 0, y = 1.2, z = -5},
@@ -44,17 +44,29 @@ function StartButton:draw()
 end
 
 function _startButtonClickedCallback(obj, playerClickerColor, altClick)
+  local getPlayersOrder = function()
+    local result = {}
+    for _, playerColor in ipairs({ "White", "Red", "Yellow", "Green", "Blue", "Pink"}) do
+      local isSeatedPlayer = function(c) return c == playerColor end
+      if (table.find(getSeatedPlayers(), isSeatedPlayer)) then
+        table.insert(result, playerColor)
+      end
+    end
+    return result
+  end
+
   state.Game = SK_Game.create()
   state.Player = {}
   for index, playerColor in ipairs(getSeatedPlayers()) do
     state.Player[playerColor] = SK_Player.create(playerColor, staticData.players[playerColor])
   end
   state.Game:startBidding()
-  local order = getSeatedPlayers()
-  shuffleTable(order)
-  Turns.order = order
+
+  Turns.enable = true
+  Turns.type = 1
   Turns.pass_turns = false
-  Turns.turn_color = order[1]
-  
+  Turns.turn_color = table.random(getSeatedPlayers())
+  Turns.order = getPlayersOrder()
   obj.destruct()
 end
+

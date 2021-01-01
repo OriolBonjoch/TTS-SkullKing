@@ -19,7 +19,7 @@ function SK_Player.create(color, data)
 
   self.chest = ChestObject.create()
   self.winsLabel= WinsLabel.create()
-  
+  self.discardsDeck = nil
   return self
 end
 
@@ -36,10 +36,10 @@ end
 
 function SK_Player:startRound()
   local round = state.Game.round
-  printToAll("Player " .. self.color .. " voted " .. self.rounds[round].vote, self.color)
+  printToAll("Player " .. self.color .. " bet " .. self.rounds[round].vote .. " wins", self.color)
   self.rounds[round].wins = 0
   self.winsLabel:draw(self.data, self.color)
-  self.winsLabel:update(0)
+  self.winsLabel:init(self.rounds[round].vote)
 end
 
 function SK_Player:canBid(obj)
@@ -63,6 +63,16 @@ function SK_Player:submitBid()
   self.rounds[state.Game.round].vote = self.vote
 end
 
+-- function SK_Player:hasCards(trick)
+--   local count = 0
+--   for index, handObj in ipairs(Player[self.color].getHandObjects()) do
+--     count = count + 1
+--   end
+--   log(self.color .. " has " .. count .. " of ".. trick)
+
+--   return trick > count
+-- end
+
 function SK_Player:playCard(cardId)
   local data = state.Deck.cards[cardId]
   if (not data) then
@@ -75,12 +85,20 @@ function SK_Player:playCard(cardId)
   table.insert(currentRound.cards, currentRound.tricks, cardId)
 end
 
-function SK_Player:hasCards(trick)
-  local count = 0
-  for index, handObj in ipairs(Player[self.color].getHandObjects()) do
-    count = count + 1
-  end
-  log(self.color .. " has " .. count .. " of ".. trick)
+function SK_Player:winTrick(trick)
+  local round = state.Game.round
+  self.rounds[round].wins = self.rounds[round].wins + 1
+  self.winsLabel:update(self.rounds[round].wins)
 
-  return trick > count
+  local trickCards = {}
+  for _, cardId in pairs(trick.cards) do
+    table.insert(trickCards, getObjectFromGUID(cardId))
+  end
+  if (self.discardsDeck) then
+    table.insert(trickCards, self.discardsDeck.getGUID())
+  end
+
+  local deckPos = self.data.discardsPosition
+  self.discardsDeck = group(trickCards)[1]
+  self.discardsDeck.setPosition(Vector(deckPos.x, deckPos.y, deckPos.z))
 end

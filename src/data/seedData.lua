@@ -73,6 +73,7 @@ staticData = {
   players = {
     White = {
       chestPosition = {x = 4, y = 1.3, z = -12},
+      discardsPosition = {x = -4, y = 1.3, z = -12},
       chestRotation = {x = 0, y = 0, z = 0},
       labelPosition = {x = 0, y = 1, z = -11},
       labelRotation = {x = 90, y = 0, z = 0},
@@ -81,19 +82,20 @@ staticData = {
     Pink = {
       chestPosition = {x = 12.392, y = 1.3, z = -2.534},
       chestRotation = {x = 0, y = 300, z = 0},
-      labelPosition = {x = -9.526, y = 1, z = -5.5},
+      labelPosition = {x = 9.526, y = 1, z = -5.5},
       labelRotation = {x = 90, y = 300, z = 0},
       chestColor = Color.Pink
     },
     Blue = {
       chestPosition = {x = 8.391, y = 1.3, z = 9.464},
       chestRotation = {x = 0, y = 240, z = 0},
-      labelPosition = {x = -9.526, y = 1, z = 5.5},
+      labelPosition = {x = 9.526, y = 1, z = 5.5},
       labelRotation = {x = 90, y = 240, z = 0},
       chestColor = Color.Blue
     },
     Green = {
       chestPosition = {x = -4, y = 1.3, z = 12},
+      discardsPosition = {x = 4, y = 1.3, z = 12},
       chestRotation = {x = 0, y = 180, z = 0},
       labelPosition = {x = 0, y = 1, z = 11},
       labelRotation = {x = 90, y = 180, z = 0},
@@ -102,14 +104,14 @@ staticData = {
     Yellow = {
       chestPosition = {x = -12.392, y = 1.3, z = 2.534},
       chestRotation = {x = 0, y = 120, z = 0},
-      labelPosition = {x = 9.526, y = 1, z = 5.5},
+      labelPosition = {x = -9.526, y = 1, z = 5.5},
       labelRotation = {x = 90, y = 120, z = 0},
       chestColor = Color.Yellow
     },
     Red = {
       chestPosition = {x = -8.391, y = 1.3, z = -9.464},
       chestRotation = {x = 0, y = 60, z = 0},
-      labelPosition = {x = 9.526, y = 1, z = 5.5},
+      labelPosition = {x = -9.526, y = 1, z = -5.5},
       labelRotation = {x = 90, y = 60, z = 0},
       chestColor = Color.Red
     }
