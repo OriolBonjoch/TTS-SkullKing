@@ -81,8 +81,9 @@ function _chestSubmitCallback(obj, player_clicker_color, alt_click)
   broadcastToAll(player_clicker_color .. " voted", player_clicker_color)
   obj.clearButtons()
 
+  local round = state.Game.round
   for color, player in pairs(state.Player) do
-    if (player.vote == -1) then
+    if (player.rounds[round].vote == -1) then
       return
     end
   end

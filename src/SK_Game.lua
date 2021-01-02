@@ -1,3 +1,5 @@
+require("src.assets.scoreBoardUI")
+
 require("src.SK_Trick")
 
 SK_Game = {}
@@ -9,10 +11,13 @@ function SK_Game.create()
   self.trick = 0
   self.tricks = {}
   self.phase = "bidding"
+
+  self.scoreBoard = ScoreBoardUI.create()
   return self
 end
 
 function SK_Game:startBidding()
+  self.scoreBoard:draw()
   self.round = self.round + 1
   self.phase = "bidding"
 
@@ -52,14 +57,23 @@ function SK_Game:endTrick()
 
   self.trick = self.trick + 1
   if (self.trick ~= self.round) then
-    return
+    return false
   end
 
-  log("round finished! calculate round points.")
   for index, playerColor in ipairs(getSeatedPlayers()) do
     local player = state.Player[playerColor]
-    log(playerColor .. " voted " .. player.vote .. " and got " .. player.rounds[self.round].vote)
+    local points = 0
+    if (player.vote == 0) then
+      points = self.round * (player.rounds[self.round].wins == 0 and 10 or -10)
+    elseif (player.vote == player.rounds[self.round].wins) then
+      points = player.vote * 20
+    else
+      points = -10 * math.abs(player.vote - player.rounds[self.round].wins)
+    end
+    log(playerColor .. " voted " .. player.vote .. " and got " .. player.rounds[self.round].wins .. " = " .. tostring(points))
+    player:addPoints(points)
   end
+  return true
 end
 
 function SK_Game:playCard(player, cardId)

@@ -41,5 +41,8 @@ end
 function onPlayerTurn(playerObj)
   if (not state.Game) then return end
   if (not state.Game:isEndTrick()) then return end
-  state.Game:endTrick()
+  local isBidAgain = state.Game:endTrick()
+  if (isBidAgain) then
+    state.Game:startBidding()
+  end
 end

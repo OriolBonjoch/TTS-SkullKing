@@ -54,7 +54,6 @@ function SK_Trick:calculate()
   self.result = {}
   self.result.winner = winner
   self.result.points = extraPoints
-  log(self.result)
 end
 
 function SK_Trick:isFinished()

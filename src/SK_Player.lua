@@ -14,6 +14,7 @@ function SK_Player.create(color, data)
   self.color = color
   self.data = data
   self.vote = -1
+  self.score = 0
   self.rounds = {}
   self.playedCard = ""
 
@@ -27,10 +28,8 @@ function SK_Player:startBidding(round)
   self.chest:draw(self.color, self.data)
   self.vote = -1
   self.rounds[round] = {
-    cards = {},
     vote = -1,
-    wins = 0,
-    tricks = 0
+    wins = 0
   }
 end
 
@@ -63,26 +62,8 @@ function SK_Player:submitBid()
   self.rounds[state.Game.round].vote = self.vote
 end
 
--- function SK_Player:hasCards(trick)
---   local count = 0
---   for index, handObj in ipairs(Player[self.color].getHandObjects()) do
---     count = count + 1
---   end
---   log(self.color .. " has " .. count .. " of ".. trick)
-
---   return trick > count
--- end
-
-function SK_Player:playCard(cardId)
-  local data = state.Deck.cards[cardId]
-  if (not data) then
-    return
-  end
-
-  printToAll(data.name .. " - " .. data.value, playerColor)
-  local currentRound = self.rounds[state.Game.round]
-  currentRound.tricks = currentRound.tricks + 1
-  table.insert(currentRound.cards, currentRound.tricks, cardId)
+function SK_Player:addPoints(points)
+  self.score = self.score + points
 end
 
 function SK_Player:winTrick(trick)
@@ -95,7 +76,7 @@ function SK_Player:winTrick(trick)
     table.insert(trickCards, getObjectFromGUID(cardId))
   end
   if (self.discardsDeck) then
-    table.insert(trickCards, self.discardsDeck.getGUID())
+    table.insert(trickCards, self.discardsDeck)
   end
 
   local deckPos = self.data.discardsPosition
