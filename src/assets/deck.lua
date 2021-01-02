@@ -48,3 +48,7 @@ function Deck:deal()
     self.obj.deal(state.Game.round, playerColor)
   end
 end
+
+function Deck:discard(card)
+  self.obj.putObject(card)
+end

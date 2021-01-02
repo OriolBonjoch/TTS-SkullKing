@@ -20,12 +20,12 @@ function SK_Player.create(color, data)
 
   self.chest = ChestObject.create()
   self.winsLabel= WinsLabel.create()
-  self.discardsDeck = nil
   return self
 end
 
 function SK_Player:startBidding(round)
   self.chest:draw(self.color, self.data)
+  self.winsLabel:hide()
   self.vote = -1
   self.rounds[round] = {
     vote = -1,
@@ -73,13 +73,6 @@ function SK_Player:winTrick(trick)
 
   local trickCards = {}
   for _, cardId in pairs(trick.cards) do
-    table.insert(trickCards, getObjectFromGUID(cardId))
+    state.Deck:discard(getObjectFromGUID(cardId))
   end
-  if (self.discardsDeck) then
-    table.insert(trickCards, self.discardsDeck)
-  end
-
-  local deckPos = self.data.discardsPosition
-  self.discardsDeck = group(trickCards)[1]
-  self.discardsDeck.setPosition(Vector(deckPos.x, deckPos.y, deckPos.z))
 end

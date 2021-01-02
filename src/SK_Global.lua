@@ -29,18 +29,28 @@ function onLoad()
   state.Deck:shuffle()
 end
 
+function onObjectPickUp(playerColor, obj)
+  if (not state.Game or not state.Player) then return end
+  local player = state.Player[playerColor]
+  if (playerColor ~= Turns.turn_color or state.Game.phase == "bidding") then
+    obj.drop()
+    return
+  end
+end
+
 function onObjectDrop(playerColor, obj)
   local player = state.Player[playerColor]
   local card = state.Deck.cards[obj.getGUID()]
-  if (not card) then return end
+  if (not player or not card) then return end
 
-  state.Game:playCard(player, obj.getGUID())
-  Turns.turn_color = Turns.getNextTurnColor()
+  local isCorrect = state.Game:playCard(player, obj.getGUID())
+  if (isCorrect) then
+    Turns.turn_color = Turns.getNextTurnColor()
+  end
 end
 
 function onPlayerTurn(playerObj)
   if (not state.Game) then return end
-  if (not state.Game:isEndTrick()) then return end
   local isBidAgain = state.Game:endTrick()
   if (isBidAgain) then
     state.Game:startBidding()

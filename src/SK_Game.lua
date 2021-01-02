@@ -39,24 +39,23 @@ function SK_Game:startRound()
   table.insert(self.tricks, SK_Trick.create())
 end
 
-function SK_Game:isEndTrick()
-  local currentTrick = self.tricks[self.trick+1]
-  if (not currentTrick) then
-    return false
-  end
-  return currentTrick:isFinished()
-end
-
 function SK_Game:endTrick()
-  -- broadcastToAll("Trick finished! calculate winner", Color.White)
   local currentTrick = self.tricks[self.trick + 1]
+  if (not currentTrick) then return false end
+  if (not currentTrick:isFinished()) then return false end
   currentTrick:calculate()
   local winnerColor = currentTrick.result.winner
   local winnerPlayer = state.Player[winnerColor]
   winnerPlayer:winTrick(currentTrick)
 
+  log("winner: " .. winnerColor)
+  if (Turns.turn_color ~= winnerColor) then
+    Turns.turn_color = winnerColor
+  end
+
   self.trick = self.trick + 1
   if (self.trick ~= self.round) then
+    table.insert(self.tricks, SK_Trick.create())
     return false
   end
 
@@ -77,14 +76,16 @@ function SK_Game:endTrick()
 end
 
 function SK_Game:playCard(player, cardId)
-  local isCard = function(obj)
-    return obj.getGUID() == cardId
-  end
-  local card = table.find(Player[player.color].getHandObjects(), isCard)
-  if (self.phase == "bidding" or card) then -- or Turns.turn_color ~= player.color
-    return
+  local card = table.find(Player[player.color].getHandObjects(), function(obj) return obj.getGUID() == cardId end)
+  if (self.phase == "bidding" or card or Turns.turn_color ~= player.color) then
+    log("playCard")
+    log(self.phase == "bidding")
+    log(card)
+    log(Turns.turn_color ~= player.color)
+    return false
   end
 
   local trick = self.tricks[self.trick+1]
   trick:playCard(player, cardId)
+  return true
 end

@@ -42,11 +42,11 @@ function SK_Trick:calculate()
       end
     else
       if (table.exists({ "bandera", "sirena", "pirata", "scary mary", "rey pirata" }, cardData.name)) then
-        suit = "bandera"
-        if (cardData.value > highestValue) then
+        if (cardData.value > highestValue or suit ~= "bandera") then
           winner = playerColor
           highestValue = cardData.value
         end
+        suit = "bandera"
       end
     end
   end

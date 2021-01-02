@@ -9,9 +9,7 @@ function WinsLabel.create()
 end
 
 function WinsLabel:draw(data, playerColor)
-  if (self.obj ~= nil) then
-    self.obj.destruct()
-  end
+  self:hide()
   local label = spawnObject(
     {
       type = "3DText",
@@ -33,4 +31,10 @@ end
 
 function WinsLabel:update(wins)
   self.obj.TextTool.setValue(tostring(wins) .. "/" .. self.bid)
+end
+
+function WinsLabel:hide()
+  if (self.obj ~= nil) then
+    self.obj.destruct()
+  end
 end

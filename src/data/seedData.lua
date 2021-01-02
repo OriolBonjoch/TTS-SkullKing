@@ -73,7 +73,6 @@ staticData = {
   players = {
     White = {
       chestPosition = {x = 4, y = 1.3, z = -12},
-      discardsPosition = {x = -4, y = 1.3, z = -12},
       chestRotation = {x = 0, y = 0, z = 0},
       labelPosition = {x = 0, y = 1, z = -11},
       labelRotation = {x = 90, y = 0, z = 0},
@@ -95,7 +94,6 @@ staticData = {
     },
     Green = {
       chestPosition = {x = -4, y = 1.3, z = 12},
-      discardsPosition = {x = 4, y = 1.3, z = 12},
       chestRotation = {x = 0, y = 180, z = 0},
       labelPosition = {x = 0, y = 1, z = 11},
       labelRotation = {x = 90, y = 180, z = 0},
