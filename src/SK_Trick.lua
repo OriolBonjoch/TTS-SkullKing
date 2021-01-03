@@ -12,7 +12,7 @@ end
 
 function SK_Trick:isValid(playerColor, cardData)
   if (cardData.name == self.suit) then return true end
-  if (table.exists({ "huida", "sirena", "pirata", "scary mary", "rey pirata" }, cardData.name)) then
+  if (table.existsValue({ "huida", "sirena", "pirata", "scary mary", "rey pirata" }, cardData.name)) then
     return true
   end
 
@@ -25,7 +25,7 @@ end
 
 function SK_Trick:playCard(player, cardId)
   local cardData = state.Deck.cards[cardId]
-  if (self.suit == "" and table.exists({ "mapa", "cofre", "loro", "bandera"}, cardData.name)) then
+  if (self.suit == "" and table.existsValue({ "mapa", "cofre", "loro", "bandera"}, cardData.name)) then
     self.suit = cardData.name
   end
   self.cards[player.color] = cardId
@@ -42,15 +42,20 @@ end
 
 function SK_Trick:calculate()
   local trickOrder = table.advance(Turns.order, self.firstPlayer)
-  local extraPoints = {}
   local suit = ""
   local highestValue = -1
   local winner = self.firstPlayer
+  local mermaid = ""
+  local skullKing = ""
+  local allSuits = {}
   for _, playerColor in ipairs(trickOrder) do
     local cardId = self.cards[playerColor]
     local cardData = state.Deck.cards[cardId]
-    log(" - " .. playerColor .. " played " .. cardData.name .. " [" .. tostring(cardData.value) .. "]")
-    if (suit == "" and table.exists({ "mapa", "cofre", "loro", "bandera"}, cardData.name)) then
+    -- log(" - " .. playerColor .. " played " .. cardData.name .. " [" .. tostring(cardData.value) .. "]")
+    table.insert(allSuits, cardData.name)
+    if (mermaid == "" and cardData.name == "sirena") then mermaid = playerColor end
+    if (skullKing == "" and cardData.name == "rey pirata") then skullKing = playerColor end
+    if (suit == "" and table.existsValue({ "mapa", "cofre", "loro", "bandera"}, cardData.name)) then
       suit = cardData.name
     end
 
@@ -60,7 +65,7 @@ function SK_Trick:calculate()
         highestValue = cardData.value
       end
     else
-      if (table.exists({ "bandera", "sirena", "pirata", "scary mary", "rey pirata" }, cardData.name)) then
+      if (table.existsValue({ "bandera", "sirena", "pirata", "scary mary", "rey pirata" }, cardData.name)) then
         if (cardData.value > highestValue or suit ~= "bandera") then
           winner = playerColor
           highestValue = cardData.value
@@ -68,6 +73,13 @@ function SK_Trick:calculate()
         suit = "bandera"
       end
     end
+  end
+
+  local extraPoints = {}
+  if (mermaid ~= "") then
+    extraPoints[mermaid] = table.countValue(allSuits, "rey pirata") * 50
+  elseif (skullKing ~= "") then
+    extraPoints[skullKing] = table.countValue(allSuits, "pirata") * 30 + table.countValue(allSuits, "scary mary") * 30
   end
 
   self.result = {}

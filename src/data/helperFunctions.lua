@@ -21,6 +21,15 @@ function table.find(tbl, func)
   return nil
 end
 
+function table.countValue(tbl, match)
+  local result = 0
+  for _, value in ipairs(tbl) do
+    if value == match then result = result + 1 end
+  end
+  return result
+end
+
+
 function table.advance(tbl, first)
   local result = {}
   local found = false
@@ -39,7 +48,7 @@ function table.advance(tbl, first)
   return tbl
 end
 
-function table.exists(tbl, val)
+function table.existsValue(tbl, val)
   for _, value in ipairs(tbl) do
     if value == val then
       return true
@@ -48,11 +57,11 @@ function table.exists(tbl, val)
   return false
 end
 
-function table.map(f, t)
-  local t1 = {}
-  local t_len = #t
-  for i = 1, t_len do
-    t1[i] = f(t[i])
-  end
-  return t1
-end
+-- function table.map(f, t)
+--   local t1 = {}
+--   local t_len = #t
+--   for i = 1, t_len do
+--     t1[i] = f(t[i])
+--   end
+--   return t1
+-- end

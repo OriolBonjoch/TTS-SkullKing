@@ -71,7 +71,6 @@ function SK_Game:endTrick()
   local winnerPlayer = state.Player[winnerColor]
   winnerPlayer:winTrick(currentTrick)
 
-  log("winner: " .. winnerColor)
   if (Turns.turn_color ~= winnerColor) then
     Turns.turn_color = winnerColor
   end
@@ -90,6 +89,12 @@ function SK_Game:score()
       points = player.currentBid * 20
     else
       points = -10 * math.abs(player.currentBid - player.wins)
+    end
+
+    for _, trick in ipairs(self.tricks) do
+      if (trick.result.points[playerColor]) then
+        points = points + trick.result.points[playerColor]
+      end
     end
     -- log(playerColor .. " voted " .. player.currentBid .. " and got " .. player.wins .. " = " .. tostring(points))
     diff[playerColor] = points
