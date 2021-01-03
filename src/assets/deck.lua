@@ -20,8 +20,8 @@ function Deck:draw()
 
   self.obj.setCustomObject(
     {
-      face = "https://github.com/OriolBonjoch/TTS-SkullKing/raw/main/data/deck.jpg",
-      back = "https://github.com/OriolBonjoch/TTS-SkullKing/raw/main/data/back.jpg",
+      face = "https://github.com/OriolBonjoch/TTS-SkullKing/raw/main/assets/deck.jpg",
+      back = "https://github.com/OriolBonjoch/TTS-SkullKing/raw/main/assets/back.jpg",
       number = 66,
       width = 10,
       height = 7
@@ -49,3 +49,12 @@ end
 function Deck:discard(card)
   self.obj.putObject(card)
 end
+
+-- function getCard(name)
+--   for cardId, card in pairs(self.cards) do
+--     if (card.name == name) then
+--       self.obj.takeObject({ guid = cardId })
+--       return
+--     end
+--   end
+-- end

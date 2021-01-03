@@ -1,5 +1,3 @@
-require("src.assets.scoreBoardUI")
-
 require("src.SK_Trick")
 
 SK_Game = {}
@@ -12,12 +10,11 @@ function SK_Game.create()
   self.tricks = {}
   self.phase = "bidding"
 
-  self.scoreBoard = ScoreBoardUI.create()
   return self
 end
 
 function SK_Game:startBidding()
-  self.scoreBoard:draw()
+  state.Interface.ScoreBoard:setData("totals")
   self.round = self.round + 1
   self.trick = 0
   self.phase = "bidding"
@@ -91,15 +88,17 @@ function SK_Game:score()
       points = -10 * math.abs(player.currentBid - player.wins)
     end
 
-    for _, trick in ipairs(self.tricks) do
-      if (trick.result.points[playerColor]) then
-        points = points + trick.result.points[playerColor]
+    if (points > 0) then
+      for _, trick in ipairs(self.tricks) do
+        if (trick.result.points[playerColor]) then
+          points = points + trick.result.points[playerColor]
+        end
       end
     end
     -- log(playerColor .. " voted " .. player.currentBid .. " and got " .. player.wins .. " = " .. tostring(points))
     diff[playerColor] = points
   end
-  self.scoreBoard:drawScores(diff)
+  state.Interface.ScoreBoard:setData("differences", diff)
   for playerColor, player in pairs(state.Player) do
     player:addPoints(diff[playerColor])
   end

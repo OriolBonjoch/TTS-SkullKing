@@ -36,7 +36,7 @@ function StartButton:draw()
 
   self.obj.setCustomObject(
     {
-      mesh = "https://github.com/OriolBonjoch/TTS-SkullKing/raw/main/data/botonazito_dividido_2mm_origen.obj",
+      mesh = "https://github.com/OriolBonjoch/TTS-SkullKing/raw/main/assets/botonazito_dividido_2mm_origen.obj",
       material = 1,
       convex = true
     }
@@ -64,7 +64,7 @@ function _startButtonClickedCallback(obj, playerClickerColor, altClick)
 
   Turns.enable = true
   Turns.type = 2
-  Turns.pass_turns = false
+  Turns.pass_turns = true
   Turns.turn_color = table.random(getSeatedPlayers())
   Turns.order = getPlayersOrder()
   obj.destruct()

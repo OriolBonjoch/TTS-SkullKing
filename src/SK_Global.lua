@@ -7,12 +7,14 @@
 -- require("src.SK_Player")
 -- require("src.SK_Game")
 -- require("src.SK_Global")
+-- require("src.SK_Interface")
 
 state = {
-  StartButton = {},
-  Deck = {},
+  StartButton = nil,
+  Deck = nil,
   Player = {},
-  Game = nil
+  Game = nil,
+  Interface = nil
 }
 
 function onLoad()
@@ -22,10 +24,10 @@ function onLoad()
 
   state.StartButton = StartButton.create()
   state.Deck = Deck.create()
+  state.Interface = SK_Interface.create()
 
   state.StartButton:draw()
   state.Deck:draw()
-  
   -- local testButton = spawnObject({
   --   type = "BlockSquare",
   --   position = {x = 0, y = 5, z = 5},
@@ -70,7 +72,11 @@ function onObjectDrop(playerColor, obj)
   if (not player or not card) then return end
   local isCorrect = state.Game:playCard(player, obj.getGUID())
   if (isCorrect) then
-    Turns.turn_color = Turns.getNextTurnColor()
+    if (card.name == "scary mary") then
+      state.Interface.ScaryMaryPrompt:show(obj.getGUID())
+    else
+      Turns.turn_color = Turns.getNextTurnColor()
+    end
   end
 end
 

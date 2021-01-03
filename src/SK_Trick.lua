@@ -78,8 +78,8 @@ function SK_Trick:calculate()
   local extraPoints = {}
   if (mermaid ~= "") then
     extraPoints[mermaid] = table.countValue(allSuits, "rey pirata") * 50
-  elseif (skullKing ~= "") then
-    extraPoints[skullKing] = table.countValue(allSuits, "pirata") * 30 + table.countValue(allSuits, "scary mary") * 30
+    if (extraPoints[mermaid] > 0) then winner = mermaid end
+  elseif (skullKing ~= "") then extraPoints[skullKing] = table.countValue(allSuits, "pirata") * 30 + table.countValue(allSuits, "scary mary") * 30
   end
 
   self.result = {}
