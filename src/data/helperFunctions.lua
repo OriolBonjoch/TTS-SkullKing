@@ -12,9 +12,9 @@ function table.random(tbl)
   return tbl[random(1, len)]
 end
 
-function table.find(tbl, funct)
+function table.find(tbl, func)
   for _, value in ipairs(tbl) do
-    if funct(value) then
+    if func(value) then
       return value
     end
   end

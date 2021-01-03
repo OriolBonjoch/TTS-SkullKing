@@ -19,9 +19,8 @@ function WinsLabel:draw(data, playerColor)
   )
   
   label.setLock(true)
-  label.TextTool.setFontColor(playerColor)
-  label.TextTool.setValue("0")
   self.obj = label
+  self:update(0)
 end
 
 function WinsLabel:init(bid)
@@ -31,6 +30,7 @@ end
 
 function WinsLabel:update(wins)
   self.obj.TextTool.setValue(tostring(wins) .. "/" .. self.bid)
+  self.obj.TextTool.setFontColor(wins == tonumber(self.bid) and Color.White or Color.Red)
 end
 
 function WinsLabel:hide()

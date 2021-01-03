@@ -19,7 +19,9 @@ end
 function SK_Game:startBidding()
   self.scoreBoard:draw()
   self.round = self.round + 1
+  self.trick = 0
   self.phase = "bidding"
+  self.tricks = {}
 
   log("+++ game startBidding")
   for playerColor, player in pairs(state.Player) do
@@ -33,10 +35,31 @@ function SK_Game:startRound()
   for playerColor, player in pairs(state.Player) do
     player:startRound()
   end
+  table.insert(self.tricks, SK_Trick.create(Turns.turn_color))
+end
 
-  self.trick = 0
-  self.tricks = {}
-  table.insert(self.tricks, SK_Trick.create())
+function SK_Game:isInvalidCard(playerColor, obj)
+  if (self.phase == "bidding") then return true end
+  local cardData = state.Deck.cards[obj.getGUID()]
+  local currentTrick = self.tricks[self.trick + 1]
+  if (not cardData or not currentTrick) then return false end
+  return not currentTrick:isValid(playerColor, cardData)
+end
+
+function SK_Game:playCard(player, cardId)
+  local card = table.find(Player[player.color].getHandObjects(), function(obj) return obj.getGUID() == cardId end)
+  if (self.phase == "bidding" or card or Turns.turn_color ~= player.color) then
+    return false
+  end
+
+  local currentTrick = self.tricks[self.trick + 1]
+  if (not currentTrick) then 
+    currentTrick = SK_Trick.create(player.color)
+    table.insert(self.tricks, currentTrick)
+  end
+
+  currentTrick:playCard(player, cardId)
+  return true
 end
 
 function SK_Game:endTrick()
@@ -54,38 +77,25 @@ function SK_Game:endTrick()
   end
 
   self.trick = self.trick + 1
-  if (self.trick ~= self.round) then
-    table.insert(self.tricks, SK_Trick.create())
-    return false
-  end
-
-  for index, playerColor in ipairs(getSeatedPlayers()) do
-    local player = state.Player[playerColor]
-    local points = 0
-    if (player.vote == 0) then
-      points = self.round * (player.rounds[self.round].wins == 0 and 10 or -10)
-    elseif (player.vote == player.rounds[self.round].wins) then
-      points = player.vote * 20
-    else
-      points = -10 * math.abs(player.vote - player.rounds[self.round].wins)
-    end
-    log(playerColor .. " voted " .. player.vote .. " and got " .. player.rounds[self.round].wins .. " = " .. tostring(points))
-    player:addPoints(points)
-  end
-  return true
+  return self.trick == self.round
 end
 
-function SK_Game:playCard(player, cardId)
-  local card = table.find(Player[player.color].getHandObjects(), function(obj) return obj.getGUID() == cardId end)
-  if (self.phase == "bidding" or card or Turns.turn_color ~= player.color) then
-    log("playCard")
-    log(self.phase == "bidding")
-    log(card)
-    log(Turns.turn_color ~= player.color)
-    return false
+function SK_Game:score()
+  local diff = {}
+  for playerColor, player in pairs(state.Player) do
+    local points = 0
+    if (player.currentBid == 0) then
+      points = self.round * (player.wins == 0 and 10 or -10)
+    elseif (player.currentBid == player.wins) then
+      points = player.currentBid * 20
+    else
+      points = -10 * math.abs(player.currentBid - player.wins)
+    end
+    -- log(playerColor .. " voted " .. player.currentBid .. " and got " .. player.wins .. " = " .. tostring(points))
+    diff[playerColor] = points
   end
-
-  local trick = self.tricks[self.trick+1]
-  trick:playCard(player, cardId)
-  return true
+  self.scoreBoard:drawScores(diff)
+  for playerColor, player in pairs(state.Player) do
+    player:addPoints(diff[playerColor])
+  end
 end

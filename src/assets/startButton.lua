@@ -63,7 +63,7 @@ function _startButtonClickedCallback(obj, playerClickerColor, altClick)
   state.Game:startBidding()
 
   Turns.enable = true
-  Turns.type = 1
+  Turns.type = 2
   Turns.pass_turns = false
   Turns.turn_color = table.random(getSeatedPlayers())
   Turns.order = getPlayersOrder()

@@ -6,10 +6,28 @@ function SK_Trick.create(playerColor)
   self.firstPlayer = playerColor
   self.cards = {}
   self.result = nil
+  self.suit = ""
   return self
 end
 
+function SK_Trick:isValid(playerColor, cardData)
+  if (cardData.name == self.suit) then return true end
+  if (table.exists({ "huida", "sirena", "pirata", "scary mary", "rey pirata" }, cardData.name)) then
+    return true
+  end
+
+  local card = table.find(Player[playerColor].getHandObjects(), function(obj)
+    local handCardData = state.Deck.cards[obj.getGUID()]
+    return handCardData.name == self.suit
+  end)
+  return not card
+end
+
 function SK_Trick:playCard(player, cardId)
+  local cardData = state.Deck.cards[cardId]
+  if (self.suit == "" and table.exists({ "mapa", "cofre", "loro", "bandera"}, cardData.name)) then
+    self.suit = cardData.name
+  end
   self.cards[player.color] = cardId
 end
 
@@ -31,6 +49,7 @@ function SK_Trick:calculate()
   for _, playerColor in ipairs(trickOrder) do
     local cardId = self.cards[playerColor]
     local cardData = state.Deck.cards[cardId]
+    log(" - " .. playerColor .. " played " .. cardData.name .. " [" .. tostring(cardData.value) .. "]")
     if (suit == "" and table.exists({ "mapa", "cofre", "loro", "bandera"}, cardData.name)) then
       suit = cardData.name
     end
@@ -54,13 +73,4 @@ function SK_Trick:calculate()
   self.result = {}
   self.result.winner = winner
   self.result.points = extraPoints
-end
-
-function SK_Trick:isFinished()
-  for playerColor, _ in pairs(state.Player) do
-    if (not self.cards[playerColor]) then
-      return false
-    end
-  end
-  return true
 end

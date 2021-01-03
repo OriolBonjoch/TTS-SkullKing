@@ -38,12 +38,9 @@ function Deck:getCards()
   end
 end
 
-function Deck:shuffle()
+function Deck:deal()
   self.obj.reset()
   self.obj.shuffle()
-end
-
-function Deck:deal()
   for playerColor, player in pairs(state.Player) do
     self.obj.deal(state.Game.round, playerColor)
   end

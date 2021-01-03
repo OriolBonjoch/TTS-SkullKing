@@ -3,9 +3,10 @@ require("src.assets.winsLabel")
 
 SK_Player = {
   color = "",
-  date = {},
-  vote = -1,
-  rounds = {}
+  data = {},
+  score = 0,
+  tempBid = -1,
+  currentBid = -1
 }
 SK_Player.__index = SK_Player
 
@@ -13,10 +14,9 @@ function SK_Player.create(color, data)
   local self = setmetatable({}, SK_Player)
   self.color = color
   self.data = data
-  self.vote = -1
   self.score = 0
-  self.rounds = {}
-  self.playedCard = ""
+  self.tempBid = -1
+  self.currentBid = -1
 
   self.chest = ChestObject.create()
   self.winsLabel= WinsLabel.create()
@@ -26,40 +26,34 @@ end
 function SK_Player:startBidding(round)
   self.chest:draw(self.color, self.data)
   self.winsLabel:hide()
-  self.vote = -1
-  self.rounds[round] = {
-    vote = -1,
-    wins = 0
-  }
+  self.wins = 0
+  self.tempBid = -1
+  self.currentBid = -1
 end
 
 function SK_Player:startRound()
   local round = state.Game.round
-  printToAll("Player " .. self.color .. " bet " .. self.rounds[round].vote .. " wins", self.color)
-  self.rounds[round].wins = 0
+  printToAll("Player " .. self.color .. " bet " .. self.currentBid .. " wins", self.color)
+  self.wins = 0
   self.winsLabel:draw(self.data, self.color)
-  self.winsLabel:init(self.rounds[round].vote)
+  self.winsLabel:init(self.currentBid)
 end
 
 function SK_Player:canBid(obj)
-  if (obj.getGUID() ~= self.chest.obj.getGUID()) then
-    return false
-  end
-  
-  return self.rounds[state.Game.round].vote == -1
+  return obj.getGUID() == self.chest.obj.getGUID() and self.currentBid == -1
 end
 
-function SK_Player:bid(vote)
-  broadcastToColor("You voted " .. vote, self.color, self.color)
-  self.vote = vote
+function SK_Player:bid(bid)
+  broadcastToColor("You betted " .. bid, self.color, self.color)
+  self.tempBid = bid
 end
 
 function SK_Player:submitBid()
-  if (self.vote == -1) then
+  if (self.tempBid == -1) then
     self:bid(0)
   end
 
-  self.rounds[state.Game.round].vote = self.vote
+  self.currentBid = self.tempBid
 end
 
 function SK_Player:addPoints(points)
@@ -68,8 +62,8 @@ end
 
 function SK_Player:winTrick(trick)
   local round = state.Game.round
-  self.rounds[round].wins = self.rounds[round].wins + 1
-  self.winsLabel:update(self.rounds[round].wins)
+  self.wins = self.wins + 1
+  self.winsLabel:update(self.wins)
 
   local trickCards = {}
   for _, cardId in pairs(trick.cards) do

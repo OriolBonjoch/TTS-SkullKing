@@ -58,12 +58,12 @@ function _chestClickedCallback(obj, player_clicker_color, alt_click)
     return
   end
 
-  local vote = (player.vote == -1) and 0 or player.vote
-  local newValue = vote
-  if alt_click and vote > 0 then
-    newValue = vote - 1
-  elseif (not alt_click and vote < state.Game.round) then
-    newValue = vote + 1
+  local bid = (player.tempBid == -1) and 0 or player.tempBid
+  local newValue = bid
+  if alt_click and bid > 0 then
+    newValue = bid - 1
+  elseif (not alt_click and bid < state.Game.round) then
+    newValue = bid + 1
   else
     return
   end
@@ -78,12 +78,12 @@ function _chestSubmitCallback(obj, player_clicker_color, alt_click)
   end
 
   player:submitBid()
-  broadcastToAll(player_clicker_color .. " voted", player_clicker_color)
+  broadcastToAll(player_clicker_color .. " bid ", player_clicker_color)
   obj.clearButtons()
 
   local round = state.Game.round
   for color, player in pairs(state.Player) do
-    if (player.rounds[round].vote == -1) then
+    if (player.currentBid == -1) then
       return
     end
   end
