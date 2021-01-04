@@ -28,34 +28,7 @@ function onLoad()
 
   state.StartButton:draw()
   state.Deck:draw()
-  -- local testButton = spawnObject({
-  --   type = "BlockSquare",
-  --   position = {x = 0, y = 5, z = 5},
-  --   rotation = {x = 0, y = 0, z = 0}
-  -- })
-
-  -- testButton.createButton({
-  --   click_function = "showLog_func",
-  --   function_owner = self,
-  --   label = "Log",
-  --   position = {0, 0.5, 0},
-  --   rotation = {0, 180, 0},
-  --   width = 400,
-  --   height = 400,
-  --   font_size = 200,
-  --   color = {0.5, 0.5, 0.5},
-  --   font_color = {1, 1, 1}
-  -- })
 end
-
--- function showLog_func()
---   log("+++++++++++++++Game.tricks++++++++++++++++++")
---   log(state.Game.phase)
---   log(state.Game.tricks)
---   log("+++++++++++++++Players++++++++++++++++++")
---   log(state.Player)
---   log("+++++++++++++++++++++++++++++++++")
--- end
 
 function onObjectPickUp(playerColor, obj)
   if (not state.Game or not state.Player[playerColor]) then return end
@@ -67,6 +40,7 @@ function onObjectPickUp(playerColor, obj)
 end
 
 function onObjectDrop(playerColor, obj)
+  if (not state.Game or not state.Player[playerColor] or not state.Deck) then return end
   local player = state.Player[playerColor]
   local card = state.Deck.cards[obj.getGUID()]
   if (not player or not card) then return end
@@ -75,7 +49,7 @@ function onObjectDrop(playerColor, obj)
     if (card.name == "scary mary") then
       state.Interface.ScaryMaryPrompt:show(obj.getGUID())
     else
-      Turns.turn_color = Turns.getNextTurnColor()
+      Wait.time(function() Turns.turn_color = Turns.getNextTurnColor() end, 5)
     end
   end
 end

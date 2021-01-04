@@ -11,7 +11,6 @@ end
 function ScaryMaryPromptUI:show(cardId)
   self.showPrompt = true
   self.scaryMaryCardId = cardId
-  log(self.scaryMaryCardId)
   state.Interface:draw()
 end
 
@@ -39,20 +38,23 @@ function ScaryMaryPromptUI:getXml()
 end
 
 function _playScaryMaryAsPirate(owner, cardId)
-  log("Played scary mary as pirate")
-  log(cardId)
-
-  state.Interface.ScaryMaryPrompt:hide()
-  state.Deck:discard(luaCard)
-  Turns.turn_color = Turns.getNextTurnColor()
+  _playScaryMary(cardId, "https://github.com/OriolBonjoch/TTS-SkullKing/raw/main/assets/PirateScaryMary.png")
 end
 
 function _playScaryMaryAsEscape(owner, cardId)
-  log("Played scary mary as escape")
-  log(cardId)
-  local luaCard = getObjectFromGUID(cardId)
+  _playScaryMary(cardId, "https://github.com/OriolBonjoch/TTS-SkullKing/raw/main/assets/EscapeScaryMary.png")
+end
 
+function _playScaryMary(cardId, faceUrl) 
+  local luaCard = getObjectFromGUID(cardId)
   state.Interface.ScaryMaryPrompt:hide()
   state.Deck:discard(luaCard)
-  Turns.turn_color = Turns.getNextTurnColor()
+  
+  local card = spawnObject({ type = "Card", position = luaCard.getPosition(), rotation = luaCard.getRotation() })
+  card.setCustomObject({
+    face = faceUrl,
+    back = "https://github.com/OriolBonjoch/TTS-SkullKing/raw/main/assets/back.jpg"
+  })
+
+  Wait.time(function() Turns.turn_color = Turns.getNextTurnColor() end, 5)
 end

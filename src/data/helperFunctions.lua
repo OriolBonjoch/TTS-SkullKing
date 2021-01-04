@@ -1,12 +1,3 @@
--- function shuffleTable(tbl)
---   local len, random = #tbl, math.random
---   for i = len, 2, -1 do
---     local j = random(1, i)
---     tbl[i], tbl[j] = tbl[j], tbl[i]
---   end
---   return tbl
--- end
-
 function table.random(tbl)
   local len, random = #tbl, math.random
   return tbl[random(1, len)]
@@ -56,12 +47,3 @@ function table.existsValue(tbl, val)
   end
   return false
 end
-
--- function table.map(f, t)
---   local t1 = {}
---   local t_len = #t
---   for i = 1, t_len do
---     t1[i] = f(t[i])
---   end
---   return t1
--- end

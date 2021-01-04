@@ -46,15 +46,16 @@ function Deck:deal()
   end
 end
 
-function Deck:discard(card)
-  self.obj.putObject(card)
+function join(newDecks)
+  for playerColor, player in pairs(state.Player) do
+    newDecks[2].deal(state.Game.round, playerColor)
+  end
+
+  state.Deck.obj = group({newDecks[1], newDecks[2]})[1]
 end
 
--- function getCard(name)
---   for cardId, card in pairs(self.cards) do
---     if (card.name == name) then
---       self.obj.takeObject({ guid = cardId })
---       return
---     end
---   end
--- end
+function Deck:discard(card)
+  card.setInvisibleTo(getSeatedPlayers())
+  self.obj.putObject(card)
+  Wait.time(function() card.setInvisibleTo({}) end, 1)
+end
