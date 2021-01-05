@@ -27,7 +27,6 @@ end
 
 function ScaryMaryPromptUI:getXml()
   if (not self.showPrompt) then return end
-  log("Scary mary printed")
   return { tag="VerticalLayout", attributes={ color="Black", childAlignment="MiddleCenter", spacing=10, height=190, width=400, padding="0 0 0 20" }, children={
     { tag="Text", attributes={ color="White", fontSize=24, fontStyle="Bold", height=80 }, value="Elige como jugar 'Scary Mary'"},
     { tag="HorizontalLayout", attributes={ childAlignment="MiddleCenter", height=80, width=170, spacing=10, padding="115 115 0 0" }, children= {
@@ -48,7 +47,7 @@ end
 function _playScaryMary(cardId, faceUrl) 
   local luaCard = getObjectFromGUID(cardId)
   state.Interface.ScaryMaryPrompt:hide()
-  state.Deck:discard(luaCard)
+  state.Deck:discardHidden(luaCard)
   
   local card = spawnObject({ type = "Card", position = luaCard.getPosition(), rotation = luaCard.getRotation() })
   card.setCustomObject({
@@ -56,5 +55,8 @@ function _playScaryMary(cardId, faceUrl)
     back = "https://github.com/OriolBonjoch/TTS-SkullKing/raw/main/assets/back.jpg"
   })
 
-  Wait.time(function() Turns.turn_color = Turns.getNextTurnColor() end, 5)
+  Wait.time(function()
+    Turns.turn_color = Turns.getNextTurnColor()
+    state.Game:endTrick()
+  end, 5)
 end

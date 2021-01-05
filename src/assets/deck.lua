@@ -55,6 +55,10 @@ function join(newDecks)
 end
 
 function Deck:discard(card)
+  self.obj.putObject(card)
+end
+
+function Deck:discardHidden(card)
   card.setInvisibleTo(getSeatedPlayers())
   self.obj.putObject(card)
   Wait.time(function() card.setInvisibleTo({}) end, 1)

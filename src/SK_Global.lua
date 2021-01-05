@@ -44,21 +44,5 @@ function onObjectDrop(playerColor, obj)
   local player = state.Player[playerColor]
   local card = state.Deck.cards[obj.getGUID()]
   if (not player or not card) then return end
-  local isCorrect = state.Game:playCard(player, obj.getGUID())
-  if (isCorrect) then
-    if (card.name == "scary mary") then
-      state.Interface.ScaryMaryPrompt:show(obj.getGUID())
-    else
-      Wait.time(function() Turns.turn_color = Turns.getNextTurnColor() end, 5)
-    end
-  end
-end
-
-function onPlayerTurn(playerObj)
-  if (not state.Game) then return end
-  local isEndRound = state.Game:endTrick()
-  if (isEndRound) then
-    state.Game:score()
-    Wait.time(function() state.Game:startBidding() end, 5)
-  end
+  state.Game:playCard(player, obj.getGUID())
 end

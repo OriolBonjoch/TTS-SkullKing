@@ -20,7 +20,6 @@ function SK_Game:startBidding()
   self.phase = "bidding"
   self.tricks = {}
 
-  log("+++ game startBidding")
   for playerColor, player in pairs(state.Player) do
     player:startBidding(self.round)
   end
@@ -46,7 +45,7 @@ end
 function SK_Game:playCard(player, cardId)
   local card = table.find(Player[player.color].getHandObjects(), function(obj) return obj.getGUID() == cardId end)
   if (self.phase == "bidding" or card or Turns.turn_color ~= player.color) then
-    return false
+    return
   end
 
   local currentTrick = self.tricks[self.trick + 1]
@@ -56,24 +55,33 @@ function SK_Game:playCard(player, cardId)
   end
 
   currentTrick:playCard(player, cardId)
-  return true
+  local cardData = state.Deck.cards[cardId]
+  if (cardData.name == "scary mary") then
+    state.Interface.ScaryMaryPrompt:show(cardId)
+    return
+  end
+
+  Turns.turn_color = Turns.getNextTurnColor()
+  Wait.time(function() self:endTrick() end, 5)
 end
 
 function SK_Game:endTrick()
   local currentTrick = self.tricks[self.trick + 1]
-  if (not currentTrick) then return false end
-  if (not currentTrick:isFinished()) then return false end
+  if (not currentTrick) then return end
+  if (not currentTrick:isFinished()) then return end
+
   currentTrick:calculate()
   local winnerColor = currentTrick.result.winner
   local winnerPlayer = state.Player[winnerColor]
   winnerPlayer:winTrick(currentTrick)
-
+  
   if (Turns.turn_color ~= winnerColor) then
     Turns.turn_color = winnerColor
   end
 
   self.trick = self.trick + 1
-  return self.trick == self.round
+  if (self.trick ~= self.round) then return end
+  Wait.time(function() self:score() end, 2)
 end
 
 function SK_Game:score()
@@ -102,4 +110,6 @@ function SK_Game:score()
   for playerColor, player in pairs(state.Player) do
     player:addPoints(diff[playerColor])
   end
+  
+  Wait.time(function() self:startBidding() end, 5)
 end
