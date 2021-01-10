@@ -3,7 +3,7 @@ ScoreBoardUI.__index = ScoreBoardUI
 
 function ScoreBoardUI.create()
   local self = setmetatable({}, ScoreBoardUI)
-  self.show = "totals"
+  self.show = ""
   self.scoresDiff = {}
   return self
 end
@@ -16,31 +16,40 @@ end
 
 function ScoreBoardUI:getXml()
   if (self.show == "totals") then
-    return self:_getNormalXml()
+    return self:_getDefaultXml(function(player) return tostring(player.score) end, 1)
   elseif (self.show == "differences") then
-    return self:_getScoresXml()
+    local getText = function(player)
+      return self.scoresDiff[player.color] < 0 and
+        (tostring(player.score) .. " - " .. tostring(-self.scoresDiff[player.color])) or 
+        (tostring(player.score) .. " + " .. tostring(self.scoresDiff[player.color]))
+    end
+    return self:_getDefaultXml(getText, 1)
+  elseif (self.show == "final") then
+    local getText = function(player)
+      local p = Player[player.color]
+      return tostring(p.steam_name) .. " - " .. tostring(player.score)
+    end
+    local startButton = { tag="Panel", attributes={ color="Black", outline="Black", outlineSize="5 5", width=800}, children={
+      {tag="Button", value="Play again", attributes={ color="White", onClick="_startGameMenuClicked", fontSize=30, width=400 }}
+    }}
+    return self:_getDefaultXml(getText, 2, {startButton})
   end
 end
 
-function ScoreBoardUI:_getNormalXml()
+function ScoreBoardUI:_getDefaultXml(getText, size, extraRows)
+  local sizeX = size
+  local sizeY = size * 2
+  local alignment = size == 1 and "MiddleRight" or "MiddleCenter"
   local rows = {}
-  table.insert(rows, { tag="Row", children={ self:_createTextPanel("Score", 25, {40, 200}, "White", "Black") }})
+  table.insert(rows, self:_createTextPanel("Score", 25 * sizeX, {40 * sizeX, 200 * sizeY}, "White", "Black"))
    for _, player in ipairs(self:_getPlayerScores()) do
-    table.insert(rows, { tag="Row", children={ self:_createTextPanel(player.score .. " points", 20, {25, 200}, "Black", player.color) }})
+    table.insert(rows, self:_createTextPanel(getText(player) .. " points", 20 * sizeX, {25 * sizeX, 200 * sizeY}, "Black", player.color))
   end
-  return { tag="TableLayout", attributes={ rectAlignment="MiddleRight", height=10+30*#rows, width=250}, children=rows}
-end
-
-function ScoreBoardUI:_getScoresXml()
-  local rows = {}
-  table.insert(rows, { tag="Row", children={ self:_createTextPanel("Score", 25, {40, 200}, "White", "Black") }})
-  for playerColor, player in pairs(self:_getPlayerScores()) do
-    local text = self.scoresDiff[player.color] < 0 and
-      (tostring(player.score) .. " - " .. tostring(-self.scoresDiff[player.color])) or 
-      (tostring(player.score) .. " + " .. tostring(self.scoresDiff[player.color]))
-    table.insert(rows, { tag="Row", children={ self:_createTextPanel(text .. " points", 20, {25, 200}, "Black", player.color) }})
+  if (extraRows) then
+    for _, newRow in pairs(extraRows) do table.insert(rows, newRow) end
   end
-  return { tag="TableLayout", attributes={ rectAlignment="MiddleRight", height=10+30*#rows, width=250}, children=rows}
+  local children = table.map(rows, function(value) return { tag="Row", children=value } end)
+  return { tag="TableLayout", attributes={ rectAlignment=alignment, height=(10+30*#rows) * sizeX, width=250 * sizeY}, children=children}
 end
 
 function ScoreBoardUI:_getPlayerScores()
@@ -52,7 +61,7 @@ function ScoreBoardUI:_getPlayerScores()
   return scores
 end
 
-function ScoreBoardUI:_createTextPanel(text, fontSize, size, color, back)
+function ScoreBoardUI:_createTextPanel(text, fontSize, size, color, back, animated)
   return {
     tag="Panel", attributes={ color=back, outline="Black", outlineSize="5 5", height=size[1], width=size[2] },
     children = {

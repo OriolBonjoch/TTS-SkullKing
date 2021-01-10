@@ -18,16 +18,14 @@ state = {
 }
 
 function onLoad()
-  for index, data in ipairs(getAllObjects()) do
-    data.destruct()
+  _startGameMenuClicked()
+end
+
+function onObjectRandomize(randomize_object,  player_color)
+  if (randomize_object.getGUID() == state.StartButton.obj.getGUID()) then
+    state.StartButton:showPrompt()
+    return
   end
-
-  state.StartButton = StartButton.create()
-  state.Deck = Deck.create()
-  state.Interface = SK_Interface.create()
-
-  state.StartButton:draw()
-  state.Deck:draw()
 end
 
 function onObjectPickUp(playerColor, obj)

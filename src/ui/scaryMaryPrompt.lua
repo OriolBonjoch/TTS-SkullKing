@@ -55,8 +55,6 @@ function _playScaryMary(cardId, faceUrl)
     back = "https://github.com/OriolBonjoch/TTS-SkullKing/raw/main/assets/back.jpg"
   })
 
-  Wait.time(function()
-    Turns.turn_color = Turns.getNextTurnColor()
-    state.Game:endTrick()
-  end, 5)
+  Turns.turn_color = Turns.getNextTurnColor()
+  Wait.time(function() state.Game:endTrick() end, 5)
 end

@@ -6,6 +6,7 @@ SK_Game.__index = SK_Game
 function SK_Game.create()
   local self = setmetatable({}, SK_Game)
   self.round = 0
+  self.maxRounds = 10
   self.trick = 0
   self.tricks = {}
   self.phase = "bidding"
@@ -14,6 +15,10 @@ function SK_Game.create()
 end
 
 function SK_Game:startBidding()
+  if (self.round == self.maxRounds) then
+    state.Interface.ScoreBoard:setData("final")
+    return
+  end
   state.Interface.ScoreBoard:setData("totals")
   self.round = self.round + 1
   self.trick = 0

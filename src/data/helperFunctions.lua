@@ -12,6 +12,16 @@ function table.find(tbl, func)
   return nil
 end
 
+function table.filter(tbl, func)
+  local result = {}
+  for _, value in ipairs(tbl) do
+    if func(value) then
+      table.insert(result, value)
+    end
+  end
+  return result
+end
+
 function table.countValue(tbl, match)
   local result = 0
   for _, value in ipairs(tbl) do
@@ -20,6 +30,13 @@ function table.countValue(tbl, match)
   return result
 end
 
+function table.map(tbl, func)
+  local result = {}
+  for _, value in ipairs(tbl) do
+    table.insert(result, func(value))
+  end
+  return result
+end
 
 function table.advance(tbl, first)
   local result = {}
